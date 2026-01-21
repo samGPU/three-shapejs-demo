@@ -1,0 +1,39 @@
+# IDEs and editors
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Build tools
+node_modules/
+dist/
+build/
+out/
+
+# Dependency directories
+jspm_packages/
+bower_components/
+
+# Testing
+coverage/
+
+# Logs and databases
+*.log
+*.sqlite
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Miscellaneous
+*.swp
+*.swo
+*.bak
+*.tmp
+*.tmp.*
+*.~lock.*
