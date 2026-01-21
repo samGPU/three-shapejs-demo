@@ -15,6 +15,8 @@ import sources from './sources.js';
 
 import StartScreen from '../UI/StartScreen.js';
 
+import { Point3D, UI } from '@alienkitty/space.js/three';
+
 let instance = null;
 
 export default class Experience {
@@ -40,6 +42,12 @@ export default class Experience {
         this.camera = new Camera();
         this.renderer = new Renderer();
         this.world = new World();
+
+        // Space.js UI
+        this.ui = new UI();
+        this.ui.animateIn();
+        document.body.appendChild(this.ui.element);
+        Point3D.init(this.renderer.instance, this.camera.instance, this.scene);
 
         // User input handler (wait for fox to be ready)
         this.userInput = null;
@@ -84,6 +92,10 @@ export default class Experience {
         this.camera.update();
         this.world.update();
         this.renderer.update();
+        
+        // Update Point3D tracking system
+        Point3D.update(this.time.elapsed * 0.001);
+        this.ui.update();
     }
 
     destroy() {

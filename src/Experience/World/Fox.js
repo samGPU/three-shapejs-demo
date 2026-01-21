@@ -1,6 +1,8 @@
 import * as THREE from 'three'
 import Experience from '../Experience.js'
 
+import { MaterialPanelController, Point3D, PanelItem } from '@alienkitty/space.js/three'
+
 export default class Fox {
     constructor() {
         this.experience = new Experience()
@@ -21,15 +23,97 @@ export default class Fox {
         this.setAnimation()
     }
 
+    setPanel() {
+        this.point = new Point3D(this.basicBox, {
+            name: 'Fox Model',
+            type: 'Animated Character'
+        })
+        this.scene.add(this.point)
+
+        MaterialPanelController.init(this.basicBox, this.point)
+        
+        // Add custom panel items
+        this.addCustomPanelItems()
+    }
+
     setModel() {
         this.model = this.resource.scene
-        this.model.scale.set(0.02, 0.02, 0.02)
         this.scene.add(this.model)
+        this.model.scale.set(0.02, 0.02, 0.02)
 
         this.model.traverse((child) => {
             if(child instanceof THREE.Mesh) {
                 child.castShadow = true
             }
+        })
+
+        // Create basic box mesh the same size as the fox model for Point3D tracking
+        // Compute bounding box of the fox model
+        const boundingBox = new THREE.Box3().setFromObject(this.model)
+        const size = boundingBox.getSize(new THREE.Vector3())
+        const center = boundingBox.getCenter(new THREE.Vector3())
+        
+        this.basicBox = new THREE.Mesh(
+            new THREE.BoxGeometry(size.x, size.y, size.z),
+            new THREE.MeshBasicMaterial()
+        )
+        this.basicBox.position.copy(center)
+        this.basicBox.visible = false // Make invisible since it's just for tracking
+        this.scene.add(this.basicBox)
+
+        this.setPanel()
+    }
+
+    addCustomPanelItems() {
+        // Add custom controls to the fox panel
+        const customItems = [
+            {
+                type: 'divider'
+            },
+            {
+                name: 'Animation'
+            },
+            {
+                type: 'divider'
+            },
+            {
+                type: 'link',
+                name: 'Play Idle',
+                callback: () => {
+                    this.playIdle()
+                }
+            },
+            {
+                type: 'link', 
+                name: 'Play Walking',
+                callback: () => {
+                    this.playWalking()
+                }
+            },
+            {
+                type: 'link',
+                name: 'Play Running', 
+                callback: () => {
+                    this.playRunning()
+                }
+            },
+            {
+                type: 'slider',
+                name: 'Scale',
+                min: 0.01,
+                max: 0.1,
+                step: 0.001,
+                value: 0.02,
+                callback: (value) => {
+                    this.model.scale.setScalar(value)
+                }
+            }
+        ]
+
+        // Add each custom item to the panel
+        customItems.forEach(itemData => {
+            const panelItem = new PanelItem(itemData)
+            this.point.addPanel(panelItem)
         })
     }
 
