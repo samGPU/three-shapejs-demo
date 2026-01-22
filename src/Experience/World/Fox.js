@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import Experience from '../Experience.js'
 
-import { MaterialPanelController, Point3D, PanelItem } from '@alienkitty/space.js/three'
+import { Point3D, PanelItem } from '@alienkitty/space.js/three'
 
 export default class Fox {
     constructor() {
@@ -24,15 +24,14 @@ export default class Fox {
     }
 
     setPanel() {
+        // Create Point3D for 3D tracking
         this.point = new Point3D(this.basicBox, {
             name: 'Fox Model',
             type: 'Animated Character'
         })
         this.scene.add(this.point)
 
-        MaterialPanelController.init(this.basicBox, this.point)
-        
-        // Add custom panel items
+        // Add your own custom panel items directly
         this.addCustomPanelItems()
     }
 
@@ -79,33 +78,45 @@ export default class Fox {
             {
                 type: 'link',
                 name: 'Play Idle',
+                value: 'Idle',
                 callback: () => {
+                    console.log('Playing idle animation')
                     this.playIdle()
                 }
             },
             {
                 type: 'link', 
                 name: 'Play Walking',
+                value: 'Walking',
                 callback: () => {
+                    console.log('Playing walking animation')
                     this.playWalking()
                 }
             },
             {
                 type: 'link',
-                name: 'Play Running', 
+                name: 'Play Running',
+                value: 'Running', 
                 callback: () => {
+                    console.log('Playing running animation')
                     this.playRunning()
                 }
             },
             {
-                type: 'slider',
-                name: 'Scale',
-                min: 0.01,
-                max: 0.1,
-                step: 0.001,
-                value: 0.02,
-                callback: (value) => {
-                    this.model.scale.setScalar(value)
+                type: 'divider'
+            },
+            {
+                name: 'Actions'
+            },
+            {
+                type: 'divider'
+            },
+            {
+                type: 'link',
+                name: 'Fox Says Hello',
+                value: 'Hello',
+                callback: () => {
+                    console.log('Fox says hello!')
                 }
             }
         ]
