@@ -1,11 +1,11 @@
 import { Howl } from 'howler';
 
 export default class SoundEffect {
-  constructor(audioFilePath) {
+  constructor(audioFilePath, options = {}) {
     this.audio = new Howl({
         src: [audioFilePath],
-        loop: false,
-        volume: 0.1,
+        loop: options.loop ?? false,
+        volume: options.volume ?? 0.1,
     });
     this.isPlaying = false;
   }
@@ -13,5 +13,17 @@ export default class SoundEffect {
   // Play the audio
   play() {
     this.audio.play();
+    this.isPlaying = true;
+  }
+
+  // Stop the audio
+  stop() {
+    this.audio.stop();
+    this.isPlaying = false;
+  }
+
+  // Set volume (0.0 to 1.0)
+  setVolume(volume) {
+    this.audio.volume(volume);
   }
 }

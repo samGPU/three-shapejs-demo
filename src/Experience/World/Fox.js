@@ -14,6 +14,8 @@ export default class Fox extends AnimatedObject {
             defaultAnimation: 'survey', // First animation in the fox model
             debugFolderName: 'fox'
         })
+
+        this.addSound('bark', '/audio/bark.ogg', { volume: 0.3 })
     }
 
     /**
@@ -33,9 +35,9 @@ export default class Fox extends AnimatedObject {
                 this.playAnimation('survey')
             }),
             InteractiveObject.divider(),
-            InteractiveObject.link('Fox Says Hello', 'Hello', () => {
+            InteractiveObject.linkWithSound('Fox Says Hello', 'Hello', function() {
                 console.log('Fox says hello!')
-            })
+            }, 'bark')
         ]
     }
 }

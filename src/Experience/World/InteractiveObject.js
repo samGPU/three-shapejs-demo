@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import { Point3D, PanelItem } from '@alienkitty/space.js/three'
 
 import Experience from '../Experience.js'
+import SoundEffect from '../Utils/SoundEffect.js'
 
 export default class InteractiveObject {
     constructor() {
@@ -13,6 +14,9 @@ export default class InteractiveObject {
         
         this.point = null
         this.trackingMesh = null
+        
+        // Sound effects map
+        this.sounds = new Map()
     }
 
     setupPanel(targetObject, options = {}) {
@@ -78,6 +82,29 @@ export default class InteractiveObject {
         }
     }
 
+    /**
+     * Create a link panel item that plays a sound when clicked.
+     * @param {string} name - Display name
+     * @param {string} value - Value text
+     * @param {Function} callback - Click callback (receives the object instance)
+     * @param {string} soundName - Name of sound to play (must be registered with addSound)
+     * @returns {Function} Returns a function that takes the object instance and returns the link config
+     */
+    static linkWithSound(name, value, callback, soundName) {
+        // Return a factory function that takes the instance
+        return (instance) => ({
+            type: 'link',
+            name,
+            value,
+            callback: () => {
+                if (soundName && instance.sounds.has(soundName)) {
+                    instance.playSound(soundName)
+                }
+                callback.call(instance)
+            }
+        })
+    }
+
     getPanelItems() {
         return []
     }
@@ -85,8 +112,58 @@ export default class InteractiveObject {
     initializePanelItems() {
         const items = this.getPanelItems()
         if (items.length > 0) {
-            this.addPanelItems(items)
+            // Process items - resolve any factory functions
+            const resolvedItems = items.map(item => {
+                if (typeof item === 'function') {
+                    return item(this)
+                }
+                return item
+            })
+            this.addPanelItems(resolvedItems)
         }
+    }
+
+    /**
+     * Register a sound effect for this object.
+     * @param {string} name - Unique name to reference this sound
+     * @param {string} path - Path to the audio file
+     * @param {Object} options - Sound options (volume, loop, etc.)
+     */
+    addSound(name, path, options = {}) {
+        const sound = new SoundEffect(path, options)
+        this.sounds.set(name, sound)
+        return sound
+    }
+
+    /**
+     * Play a registered sound by name.
+     * @param {string} name - Name of the sound to play
+     */
+    playSound(name) {
+        const sound = this.sounds.get(name)
+        if (sound) {
+            sound.play()
+        } else {
+            console.warn(`Sound "${name}" not found. Register it with addSound() first.`)
+        }
+    }
+
+    /**
+     * Stop a registered sound by name.
+     * @param {string} name - Name of the sound to stop
+     */
+    stopSound(name) {
+        const sound = this.sounds.get(name)
+        if (sound) {
+            sound.stop()
+        }
+    }
+
+    /**
+     * Stop all registered sounds.
+     */
+    stopAllSounds() {
+        this.sounds.forEach(sound => sound.stop())
     }
 
     disposePanel() {
@@ -101,5 +178,21 @@ export default class InteractiveObject {
             this.trackingMesh.material.dispose()
             this.trackingMesh = null
         }
+    }
+
+    /**
+     * Clean up all sounds.
+     */
+    disposeSounds() {
+        this.stopAllSounds()
+        this.sounds.clear()
+    }
+
+    /**
+     * Full cleanup.
+     */
+    dispose() {
+        this.disposePanel()
+        this.disposeSounds()
     }
 }

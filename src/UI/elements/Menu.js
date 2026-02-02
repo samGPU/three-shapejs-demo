@@ -16,7 +16,7 @@ export default class Menu {
             });
 
             if (index === this.currentIndex) {
-                menuItem.setSelected(true);
+                menuItem.setSelected(true, false);
             }
 
             this.container.appendChild(menuItem.element);

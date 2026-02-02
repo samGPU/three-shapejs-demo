@@ -36,10 +36,12 @@ export default class MenuItem extends EventEmitter {
         });
     }
 
-    setSelected(isSelected) {
+    setSelected(isSelected, playSound = true) {
         if (isSelected) {
             this.element.classList.add('selected');
-            this.menuChangeSound.play();
+            if (playSound) {
+                this.menuChangeSound.play();
+            }
         } else {
             this.element.classList.remove('selected');
         }

@@ -202,7 +202,9 @@ export default class AnimatedObject extends InteractiveObject {
     }
 
     getCustomPanelItems() {
-        return []
+        return [
+            InteractiveObject.label('Undentified object..')
+        ]
     }
 
     setupDebugControls() {
